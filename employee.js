@@ -76,6 +76,60 @@ function addDepartment() {
     })
 };
 
+function addRole() {
+    inquirer.prompt([
+        {
+            name: "roleType",
+            message: "please enter a role type:",
+        }
+    ]).then((data) => {
+        var title = data.roleType;
+        connection.query("INSERT INTO role SET ?",
+            {
+                title: title
+            },
+            (err) => {
+                console.log(err)
+                if (err) throw err;
+                start();
+            }
+
+        )
+    })
+};
+
+function addEmployee() {
+    inquirer.prompt([
+        {
+            name: "employeeFirstName",
+            message: "please enter employees first name:"
+        },
+        {
+            name: "employeeLastName",
+            message: "please enter employees last name:"
+        }
+    ]).then((data) => {
+        let firstName = data.employeeFirstName;
+        let lastName = data.employeeLastName;
+        connection.query("INSERT INTO employee SET ? WHERE ?",
+            {
+                firstName: firstName
+
+            },
+            {
+                lastName: lastName
+
+            },
+            (err) => {
+                console.log(err)
+                if (err) throw err;
+                start();
+            }
+
+        )
+    })
+}
+
 
 
 
