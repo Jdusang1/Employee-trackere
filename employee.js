@@ -8,6 +8,10 @@ const connection = mysql.createConnection({
     database: "employee_db"
 });
 
+const employee = [{
+    value: "id",
+    name: "first_name"
+}]
 
 const start = () => {
     inquirer.prompt([
@@ -158,7 +162,7 @@ const viewRoles = () => {
         }
     ]).then((data) => {
         const title = data.role;
-        connection.query("SELECT * FROM employee WHERE title= ?", [title], (err, data) => {
+        connection.query("SELECT * FROM employee WHERE ?", [title], (err, data) => {
 
             if (err) throw err;
             console.table(data);
@@ -176,39 +180,29 @@ const viewAllEmployees = () => {
 
 }
 
-const updateEmployeeRoles = async () => {
-    const employee = await connection.query("SELECT * FROM employee");
-    const role = await connection.query("SELECT * FROM role");
+const updateEmployeeRoles = () => {
+    connection.query("SELECT * FROM employee", function (err, results) {
+        inquirer
+            .prompt([
+                {
+                    name: "firstName",
+                    type: "rawlist",
+                    choices: function () {
+                        var choiceArray = [];
+                        for (var i = 0; i < results.length; i++) {
+                            choiceArray.push(results[i].first_name);
+                        }
+                        return choiceArray;
+                    },
+                    message: "Which employees role would you like to change?"
+                }
 
-    const data = await inquirer.prompt([{
-        type: "list",
-        name: "chosenEmployee",
-        message: "Which employee would you like to update?",
-        choices: employee.map(employee => ({
-            name: employee.first_name + " " + employee.last_name,
-            value: employee.id
-        }))
-    },
-    {
-        type: "rawlist",
-        name: "newRole",
-        message: "What is the employees new role?",
-        choices: role.map(role => ({
-            name: role.title,
-            value: role.id
-        }))
-    }
-    ])
 
-    const res = await connection.query("UPDATE employee SET ? WHERE ?", [{
-        role_id: data.newRole
-    },
-    {
-        id: data.chosenEmployee
-    }
-    ])
-    console.log(`\n${res.affectedRows} has been updated.\n`);
-    start();
+            ])
+
+    })
+
+
 };
 
 
@@ -221,3 +215,38 @@ connection.connect((err) => {
 
 });
 
+// const employee = await connection.query("SELECT * FROM employee ");
+//     console.log(employee)
+
+
+//     const role = await connection.query("SELECT * FROM role");
+
+//     const data = await inquirer.prompt([{
+//         type: "list",
+//         name: "chosenEmployee",
+//         message: "Which employee would you like to update?",
+//         choices: employee.map(employee => ({
+//             name: employee.first_name + '' + employee.last_name,
+//             value: employee.id
+//         }))
+//     },
+//     {
+//         type: "rawlist",
+//         name: "newRole",
+//         message: "What is the employees new role?",
+//         choices: role.map(role => ({
+//             name: role.title,
+//             value: role.id
+//         }))
+//     }
+//     ])
+
+//     const res = await connection.query("UPDATE employee SET ? WHERE ?", [{
+//         role_id: data.newRole
+//     },
+//     {
+//         id: data.chosenEmployee
+//     }
+//     ])
+//     console.log(`\n${res.affectedRows} has been updated.\n`);
+//     start();
